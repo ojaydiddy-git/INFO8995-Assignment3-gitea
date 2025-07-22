@@ -1,33 +1,133 @@
-# cdevops-gitea
-k8s gitea lab to take dev (sqlite based) to prod (mysql based)
+# INFO8995 – Assignment 3: Open Source CI/CD Pipeline with Gitea
 
-TLDR;
+## 📌 Objective
+
+This project demonstrates the setup of an open-source CI/CD environment using **Gitea** deployed in Kubernetes via Helm charts. It includes transitioning from a development environment (SQLite) to a production setup backed by **MySQL** and **persistent volumes**, with public access via **ngrok**. Automation is done using **Ansible**.
+
+---
+
+## 🧰 Tools & Technologies
+
+- Kubernetes
+- Helm
+- Gitea
+- MySQL
+- Ansible
+- Ngrok
+- GitHub Actions
+
+---
+
+## ✅ Key Deliverables (Marking Rubric)
+
+| Requirement                                                | Status |
+|------------------------------------------------------------|--------|
+| Persistent Gitea via Helm                                  | ✅     |
+| Gitea using external MySQL database                        | ✅     |
+| Ngrok tunnel for public access                             | ✅     |
+| Separate Ansible playbook for ngrok                        | ✅     |
+| Clear, accurate README                                     | ✅     |
+
+---
+
+## 🚀 Setup Instructions
+
+> Make sure you have `kubectl`, `helm`, `ansible`, and `ngrok` installed.
+
+### 1. Clone the Repository
 
 ```bash
-pip install ansible kubernetes
+git clone https://github.com/ojaydiddy-git/INFO8995-Assignment3-gitea.git
+cd INFO8995-Assignment3-gitea
+```
+
+### 2. Initialize Git Submodules (if any)
+
+```bash
 git submodule update --init --recursive
-ansible-playbook up.yml
 ```
 
-Wait until `kubectl get pod` shows all pods running and:
+### 3. Start Kubernetes Cluster
+
+Start your local k8s cluster (e.g., via Docker Desktop or Minikube) and verify with:
 
 ```bash
-kubectl port-forward svc/gitea-http 3000:3000
+kubectl get nodes
 ```
 
-Now you should be able to access gitea in development mode.
+### 4. Deploy Gitea in Production (MySQL) Mode
 
-The challenge is to run this in production mode.
+Run:
 
-### Points to Cover
+```bash
+ansible-playbook prod/up.yml
+```
 
-## Marking
+Wait for all pods to be ready:
 
-|Item|Out Of|
-|--|--:|
-|use [the gitea helm](https://gitea.com/gitea/helm-gitea) to make the repository data persistent|3|
-|make gitea use external database|3|
-|Use [this article](https://blog.techiescamp.com/using-ngrok-with-kubernetes/) to expose your gitea instance publically|2|
-|make the README easy to use and ACCURATE|2|
-|||
-|total|10|
+```bash
+kubectl get pods
+```
+
+You should see:
+- `gitea-*`
+- `gitea-valkey-*`
+- All with STATUS `Running`
+
+### 5. Start ngrok Tunnel (Public Exposure)
+
+Run:
+
+```bash
+ansible-playbook ngrok/up.yml
+```
+
+It will output a public link like:
+
+```
+Your Gitea instance is publicly accessible at: https://c1bfc6493b76.ngrok-free.app
+```
+
+Paste this in the submission comment.
+
+---
+
+## 🌍 Public Access
+
+Your Gitea instance can be accessed at:
+
+🔗 **https://c1bfc6493b76.ngrok-free.app**
+
+---
+
+## 🔄 Teardown
+
+To remove the Gitea environment:
+
+```bash
+ansible-playbook prod/down.yml
+```
+
+And to stop ngrok:
+
+```bash
+ansible-playbook ngrok/down.yml
+```
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
